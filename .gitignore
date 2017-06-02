@@ -13,3 +13,4 @@ packages
 .vs
 .*
 log.txt
+/src/Client/*.nupkg

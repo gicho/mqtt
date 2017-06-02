@@ -310,7 +310,6 @@ namespace System.Net.Mqtt.Client
 		void Close (Exception ex)
 		{
 			tracer.Error (ex);
-			receiver.OnError (ex);
 			Close (ClosedReason.Error, ex.Message);
 		}
 

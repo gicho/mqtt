@@ -77,7 +77,8 @@ namespace System.Net.Mqtt.Client
 
 		IDisposable ListenFirstPacket ()
 		{
-			return channel.Receiver
+			return channel
+				.Receiver
 				.FirstOrDefaultAsync ()
 				.Subscribe (async packet => {
 					if (packet == default (IPacket)) {
@@ -91,6 +92,10 @@ namespace System.Net.Mqtt.Client
 					if (connectAck == null) {
 						NotifyError (Properties.Resources.ClientPacketListener_FirstReceivedPacketMustBeConnectAck);
 						return;
+					}
+
+					if (configuration.KeepAliveSecs > 0) {
+						StartKeepAliveMonitor();
 					}
 
 					await DispatchPacketAsync (packet)
@@ -126,16 +131,12 @@ namespace System.Net.Mqtt.Client
 
 		IDisposable ListenSentConnectPacket ()
 		{
-			return channel.Sender
+			return channel
+				.Sender
 				.OfType<Connect> ()
 				.FirstAsync ()
-				.ObserveOn (NewThreadScheduler.Default)
 				.Subscribe (connect => {
 					clientId = connect.ClientId;
-
-					if (configuration.KeepAliveSecs > 0) {
-						StartKeepAliveMonitor ();
-					}
 				});
 		}
 
